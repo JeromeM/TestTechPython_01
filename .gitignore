@@ -1,0 +1,8 @@
+__pycache__
+
+# PLY files
+parser.out
+parsetab.py
+
+# DB File
+*.db
