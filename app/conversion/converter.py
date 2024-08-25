@@ -1,7 +1,14 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import distinct
 from app.models import CurrencyRate
 from datetime import date
 import logging
+
+# Get supported currencies from DB
+def get_supported_currencies(db: Session):
+    currencies = [currency[0] for currency in db.query(distinct(CurrencyRate.currency)).all()]
+    currencies.append('EUR')
+    return currencies
 
 def get_latest_rate(db: Session, currency: str):
     # There are some days with no conversion rates.. We will search the latest
@@ -10,6 +17,12 @@ def get_latest_rate(db: Session, currency: str):
 def convert_currency(db: Session, amount: float, from_currency: str, to_currency: str):
     # The function can convert from and to EUR
     logging.debug(f"Converting {amount} from {from_currency} to {to_currency}")
+
+    # Check if currencies are supported
+    supported_currencies = get_supported_currencies(db)
+    logging.debug(supported_currencies)
+    if from_currency not in supported_currencies or to_currency not in supported_currencies:
+        raise ValueError(f"Unsupported currency: {from_currency if from_currency not in supported_currencies else to_currency}")
 
     if from_currency == "EUR":
         to_rate = get_latest_rate(db, to_currency)
