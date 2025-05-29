@@ -1,4 +1,4 @@
-# Lengow Technical Test
+# XXXXX Technical Test
 
 To run the application:
 
